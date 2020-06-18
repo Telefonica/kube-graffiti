@@ -1,22 +1,17 @@
-FROM golang:1.13.5-alpine as build
+FROM golang:1.14.4-alpine3.12 as build
 
-RUN apk --no-cache add git curl
-RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+WORKDIR /root
+COPY . .
 
-RUN addgroup -g 10001 app && adduser -D -g '' -G app -s /bin/false -h /go/src/github.com/Telefonica/kube-graffiti -u 10001 app
-WORKDIR /go/src/github.com/Telefonica/kube-graffiti
-
-COPY . /go/src/github.com/Telefonica/kube-graffiti
-RUN dep ensure -v
 ENV CGO_ENABLED 0
 RUN go test ./...
-RUN go build -o kube-graffiti -ldflags '-s -w -extldflags "-static"' main.go
+RUN go build -trimpath -ldflags '-s -w' -o kube-graffiti .
 
-FROM alpine:3.11
+FROM alpine:3.12
 LABEL maintainer="javier.provechofernandez@telefonica.com"
 
 RUN addgroup -g 10001 app && adduser -D -g '' -G app -s /bin/false -h /app -u 10001 app
 USER 10001
-COPY --chown=app:app --from=build /go/src/github.com/Telefonica/kube-graffiti/kube-graffiti /app/kube-graffiti
+COPY --chown=app:app --from=build /root/kube-graffiti /bin/kube-graffiti
 
-ENTRYPOINT ["/app/kube-graffiti"]
+ENTRYPOINT ["kube-graffiti"]
