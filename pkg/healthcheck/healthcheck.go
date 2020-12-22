@@ -14,6 +14,7 @@ limitations under the License.
 package healthcheck
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -40,7 +41,7 @@ type kubernetesClient interface {
 }
 
 type kubernetesNamespaceAccessor interface {
-	List(options metav1.ListOptions) (*corev1.NamespaceList, error)
+	List(ctx context.Context, options metav1.ListOptions) (*corev1.NamespaceList, error)
 }
 
 // CutDownKubernetesClient wraps a real kubernetes client and implements the kubernetesNamespaceAccessor interface
@@ -103,7 +104,7 @@ func (h HealthChecker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mylog := log.ComponentLogger(componentName, "healthCheckHandler")
 	reqLog := mylog.With().Str("url", r.URL.String()).Str("host", r.Host).Str("method", r.Method).Str("ua", r.UserAgent()).Str("remote", r.RemoteAddr).Logger()
 	reqLog.Debug().Msg("health check triggered, listing namespaces via kubernetes api")
-	_, err := h.client.namespaces().List(metav1.ListOptions{})
+	_, err := h.client.namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Header().Set("Content-Type", "application/json")

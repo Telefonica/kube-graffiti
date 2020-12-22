@@ -14,6 +14,7 @@ limitations under the License.
 package existing
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -73,47 +74,47 @@ type mockDynamicResourceInterface struct {
 	mock.Mock
 }
 
-func (rc *mockDynamicResourceInterface) Create(obj *unstructured.Unstructured, options metav1.CreateOptions, subresources ...string) (*unstructured.Unstructured, error) {
+func (rc *mockDynamicResourceInterface) Create(ctx context.Context, obj *unstructured.Unstructured, options metav1.CreateOptions, subresources ...string) (*unstructured.Unstructured, error) {
 	args := rc.Called(obj, subresources)
 	return args.Get(0).(*unstructured.Unstructured), args.Error(1)
 }
 
-func (rc *mockDynamicResourceInterface) Update(obj *unstructured.Unstructured, options metav1.UpdateOptions, subresources ...string) (*unstructured.Unstructured, error) {
+func (rc *mockDynamicResourceInterface) Update(ctx context.Context, obj *unstructured.Unstructured, options metav1.UpdateOptions, subresources ...string) (*unstructured.Unstructured, error) {
 	args := rc.Called(obj, subresources)
 	return args.Get(0).(*unstructured.Unstructured), args.Error(1)
 }
 
-func (rc *mockDynamicResourceInterface) UpdateStatus(obj *unstructured.Unstructured, options metav1.UpdateOptions) (*unstructured.Unstructured, error) {
+func (rc *mockDynamicResourceInterface) UpdateStatus(ctx context.Context, obj *unstructured.Unstructured, options metav1.UpdateOptions) (*unstructured.Unstructured, error) {
 	args := rc.Called(obj)
 	return args.Get(0).(*unstructured.Unstructured), args.Error(1)
 }
 
-func (rc *mockDynamicResourceInterface) Delete(name string, options *metav1.DeleteOptions, subresources ...string) error {
+func (rc *mockDynamicResourceInterface) Delete(ctx context.Context, name string, options metav1.DeleteOptions, subresources ...string) error {
 	args := rc.Called(name, options, subresources)
 	return args.Error(0)
 }
 
-func (rc *mockDynamicResourceInterface) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (rc *mockDynamicResourceInterface) DeleteCollection(ctx context.Context, options metav1.DeleteOptions, listOptions metav1.ListOptions) error {
 	args := rc.Called(options, listOptions)
 	return args.Error(0)
 }
 
-func (rc *mockDynamicResourceInterface) Get(name string, options metav1.GetOptions, subresources ...string) (*unstructured.Unstructured, error) {
+func (rc *mockDynamicResourceInterface) Get(ctx context.Context, name string, options metav1.GetOptions, subresources ...string) (*unstructured.Unstructured, error) {
 	args := rc.Called(name, options, subresources)
 	return args.Get(0).(*unstructured.Unstructured), args.Error(1)
 }
 
-func (rc *mockDynamicResourceInterface) List(opts metav1.ListOptions) (*unstructured.UnstructuredList, error) {
+func (rc *mockDynamicResourceInterface) List(ctx context.Context, opts metav1.ListOptions) (*unstructured.UnstructuredList, error) {
 	args := rc.Called(opts)
 	return args.Get(0).(*unstructured.UnstructuredList), args.Error(1)
 }
 
-func (rc *mockDynamicResourceInterface) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (rc *mockDynamicResourceInterface) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	args := rc.Called(opts)
 	return args.Get(0).(watch.Interface), args.Error(1)
 }
 
-func (rc *mockDynamicResourceInterface) Patch(name string, pt types.PatchType, data []byte, options metav1.PatchOptions, subresources ...string) (*unstructured.Unstructured, error) {
+func (rc *mockDynamicResourceInterface) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, options metav1.PatchOptions, subresources ...string) (*unstructured.Unstructured, error) {
 	args := rc.Called(name, pt, data, subresources)
 
 	if args.Get(0) == nil {
@@ -875,35 +876,35 @@ payload:
 
 var unstructuredNamespaceListJSON = `{
 	"kind":"NamespaceList",
-	"metadata":{  
+	"metadata":{
 	   "resourceVersion":"93475",
 	   "selfLink":"/api/v1/namespaces"
 	},
-	"items":[  
-	   {  
+	"items":[
+	   {
 		  "apiVersion":"v1",
 		  "kind":"Namespace",
-		  "metadata":{  
+		  "metadata":{
 			 "creationTimestamp":"2018-09-10T09:34:31Z",
 			 "name":"default",
 			 "resourceVersion":"561",
 			 "selfLink":"/api/v1/namespaces/default",
 			 "uid":"b8337c4c-b4dc-11e8-990c-08002722bfc3"
 		  },
-		  "spec":{  
-			 "finalizers":[  
+		  "spec":{
+			 "finalizers":[
 				"kubernetes"
 			 ]
 		  },
-		  "status":{  
+		  "status":{
 			 "phase":"Active"
 		  }
 	   },
-	   {  
+	   {
 		  "apiVersion":"v1",
 		  "kind":"Namespace",
-		  "metadata":{  
-			 "annotations":{  
+		  "metadata":{
+			 "annotations":{
 				"iam.amazonaws.com/permitted":".*",
 				"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"kube-graffiti\",\"namespace\":\"\"}}\n"
 			 },
@@ -913,39 +914,39 @@ var unstructuredNamespaceListJSON = `{
 			 "selfLink":"/api/v1/namespaces/kube-graffiti",
 			 "uid":"fa0bd159-b4dc-11e8-990c-08002722bfc3"
 		  },
-		  "spec":{  
-			 "finalizers":[  
+		  "spec":{
+			 "finalizers":[
 				"kubernetes"
 			 ]
 		  },
-		  "status":{  
+		  "status":{
 			 "phase":"Active"
 		  }
 	   },
-	   {  
+	   {
 		  "apiVersion":"v1",
 		  "kind":"Namespace",
-		  "metadata":{  
+		  "metadata":{
 			 "creationTimestamp":"2018-09-10T09:34:35Z",
 			 "name":"kube-public",
 			 "resourceVersion":"563",
 			 "selfLink":"/api/v1/namespaces/kube-public",
 			 "uid":"baa8ff7c-b4dc-11e8-990c-08002722bfc3"
 		  },
-		  "spec":{  
-			 "finalizers":[  
+		  "spec":{
+			 "finalizers":[
 				"kubernetes"
 			 ]
 		  },
-		  "status":{  
+		  "status":{
 			 "phase":"Active"
 		  }
 	   },
-	   {  
+	   {
 		  "apiVersion":"v1",
 		  "kind":"Namespace",
-		  "metadata":{  
-			 "annotations":{  
+		  "metadata":{
+			 "annotations":{
 				"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"kube-system\",\"namespace\":\"\"}}\n"
 			 },
 			 "creationTimestamp":"2018-09-10T09:34:31Z",
@@ -954,24 +955,24 @@ var unstructuredNamespaceListJSON = `{
 			 "selfLink":"/api/v1/namespaces/kube-system",
 			 "uid":"b836fe94-b4dc-11e8-990c-08002722bfc3"
 		  },
-		  "spec":{  
-			 "finalizers":[  
+		  "spec":{
+			 "finalizers":[
 				"kubernetes"
 			 ]
 		  },
-		  "status":{  
+		  "status":{
 			 "phase":"Active"
 		  }
 	   },
-	   {  
+	   {
 		  "apiVersion":"v1",
 		  "kind":"Namespace",
-		  "metadata":{  
-			 "annotations":{  
+		  "metadata":{
+			 "annotations":{
 				"iam.amazonaws.com/permitted":".*"
 			 },
 			 "creationTimestamp":"2018-09-10T20:20:03Z",
-			 "labels":{  
+			 "labels":{
 				"fruit": "apple"
 			 },
 			 "name":"test-namespace",
@@ -979,12 +980,12 @@ var unstructuredNamespaceListJSON = `{
 			 "selfLink":"/api/v1/namespaces/test-namespace",
 			 "uid":"e67c4503-b536-11e8-990c-08002722bfc3"
 		  },
-		  "spec":{  
-			 "finalizers":[  
+		  "spec":{
+			 "finalizers":[
 				"kubernetes"
 			 ]
 		  },
-		  "status":{  
+		  "status":{
 			 "phase":"Active"
 		  }
 	   }
@@ -1100,7 +1101,7 @@ var unstructuredDeployListJSON = `{
 						 "imagePullPolicy":"Always",
 						 "name":"nginx",
 						 "resources":{
- 
+
 						 },
 						 "terminationMessagePath":"/dev/termination-log",
 						 "terminationMessagePolicy":"File"
@@ -1110,7 +1111,7 @@ var unstructuredDeployListJSON = `{
 				   "restartPolicy":"Always",
 				   "schedulerName":"default-scheduler",
 				   "securityContext":{
- 
+
 				   },
 				   "terminationGracePeriodSeconds":30
 				}

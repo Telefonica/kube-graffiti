@@ -15,6 +15,7 @@ limitations under the License.
 package existing
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -239,7 +240,7 @@ func applyToAllResourcesOfType(rule *config.Rule, gv string, resource metav1.API
 	ri := dynamicClient.Resource(grv)
 
 	// get first list of items up to our limit
-	list, err := ri.List(metav1.ListOptions{Limit: itemLimit})
+	list, err := ri.List(context.TODO(), metav1.ListOptions{Limit: itemLimit})
 	if err != nil {
 		rlog.Error().Err(err).Msg("failed to list resources")
 		return
@@ -256,7 +257,7 @@ func applyToAllResourcesOfType(rule *config.Rule, gv string, resource metav1.API
 	// if we only got a partial list we need to continue until we have seen them all
 	meta := list.Object["metadata"].(map[string]interface{})
 	for cont, ok := meta["continue"]; ok; {
-		list, err = ri.List(metav1.ListOptions{Limit: itemLimit, Continue: cont.(string)})
+		list, err = ri.List(context.TODO(), metav1.ListOptions{Limit: itemLimit, Continue: cont.(string)})
 		if err != nil {
 			rlog.Error().Err(err).Msg("failed to list resources")
 			return
@@ -327,11 +328,11 @@ func applyToObject(rule *config.Rule, gv, resource string, object unstructured.U
 	ri := dynamicClient.Resource(grv)
 	if namespace == "" {
 		rlog.Debug().Msg("patching cluster level object")
-		_, err = ri.Patch(name, types.JSONPatchType, patch, metav1.PatchOptions{FieldManager: "kube-graffiti"})
+		_, err = ri.Patch(context.TODO(), name, types.JSONPatchType, patch, metav1.PatchOptions{FieldManager: "kube-graffiti"})
 	} else {
 		rlog.Debug().Msg("patching namespaced object")
 		nri := ri.Namespace(namespace)
-		_, err = nri.Patch(name, types.JSONPatchType, patch, metav1.PatchOptions{FieldManager: "kube-graffiti"})
+		_, err = nri.Patch(context.TODO(), name, types.JSONPatchType, patch, metav1.PatchOptions{FieldManager: "kube-graffiti"})
 	}
 	if err != nil {
 		rlog.Error().Err(err).Msg("failed to patch object")

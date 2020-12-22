@@ -14,6 +14,7 @@ limitations under the License.
 package webhook
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -57,9 +58,9 @@ func (s Server) RegisterHook(r Registration, clientset *kubernetes.Clientset) er
 	}
 
 	client := clientset.AdmissionregistrationV1beta1().MutatingWebhookConfigurations()
-	_, err = client.Get(r.Name, metav1.GetOptions{})
+	_, err = client.Get(context.TODO(), r.Name, metav1.GetOptions{})
 	if err == nil {
-		if err := client.Delete(r.Name, nil); err != nil {
+		if err := client.Delete(context.TODO(), r.Name, metav1.DeleteOptions{}); err != nil {
 			mylog.Error().Err(err).Str("name", r.Name).Msg("failed to delete the webhook")
 			return errors.New("failed to delete the webhook")
 		}
@@ -99,7 +100,7 @@ func (s Server) RegisterHook(r Registration, clientset *kubernetes.Clientset) er
 			},
 		},
 	}
-	if _, err := client.Create(webhookConfig); err != nil {
+	if _, err := client.Create(context.TODO(), webhookConfig, metav1.CreateOptions{}); err != nil {
 		mylog.Error().Err(err).Str("name", r.Name).Msg("webhook registration failed")
 		return errors.New("webhook registration failed")
 	}

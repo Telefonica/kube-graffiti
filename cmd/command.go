@@ -61,7 +61,7 @@ func init() {
 	rootCmd.PersistentFlags().String("log-level", DefaultLogLevel, "[GRAFFITI_LOG_LEVEL] set logging verbosity to one of panic, fatal, error, warn, info, debug")
 	viper.BindPFlag("log-level", rootCmd.PersistentFlags().Lookup("log-level"))
 	// viper.BindEnv("log-level", "GRAFFITI_LOG_LEVEL")
-	rootCmd.PersistentFlags().Bool("check-existing", false, "[GRAFFITTI_CHECK_EXISTING] run rules against existing objects")
+	rootCmd.PersistentFlags().Bool("check-existing", false, "[GRAFFITI_CHECK_EXISTING] run rules against existing objects")
 	viper.BindPFlag("check-existing", rootCmd.PersistentFlags().Lookup("check-existing"))
 
 	// set up Viper environment variable binding...
@@ -212,7 +212,7 @@ func initExistingCheck(config config.Configuration, r *rest.Config) error {
 	return nil
 }
 
-// LoadConfig is reponsible for loading the viper configuration file.
+// LoadConfig is responsible for loading the viper configuration file.
 func loadConfig(file string) (config.Configuration, error) {
 	setDefaults()
 

@@ -14,6 +14,7 @@ limitations under the License.
 package existing
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -48,15 +49,15 @@ type namespaceListerWatcherGetter struct {
 }
 
 func (lwg namespaceListerWatcherGetter) List(options metav1.ListOptions) (runtime.Object, error) {
-	return lwg.ns.List(metav1.ListOptions{})
+	return lwg.ns.List(context.TODO(), metav1.ListOptions{})
 }
 
 func (lwg namespaceListerWatcherGetter) Watch(options metav1.ListOptions) (watch.Interface, error) {
-	return lwg.ns.Watch(metav1.ListOptions{})
+	return lwg.ns.Watch(context.TODO(), metav1.ListOptions{})
 }
 
 func (lwg namespaceListerWatcherGetter) Get(name string, options metav1.GetOptions) (*corev1.Namespace, error) {
-	return lwg.ns.Get(name, options)
+	return lwg.ns.Get(context.TODO(), name, options)
 }
 
 func newNamespaceListerWatcherGetter(rest *rest.Config) (namespaceListerWatcherGetter, error) {

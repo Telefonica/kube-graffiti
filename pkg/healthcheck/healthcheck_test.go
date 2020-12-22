@@ -14,6 +14,7 @@ limitations under the License.
 package healthcheck
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -36,10 +37,11 @@ func (k *kubernetesClientMock) namespaces() kubernetesNamespaceAccessor {
 }
 
 type kubernetesNamespaceAccessorMock struct {
+	context.Context
 	mock.Mock
 }
 
-func (r *kubernetesNamespaceAccessorMock) List(options metav1.ListOptions) (*corev1.NamespaceList, error) {
+func (r *kubernetesNamespaceAccessorMock) List(ctx context.Context, options metav1.ListOptions) (*corev1.NamespaceList, error) {
 	args := r.Called(options)
 	return args.Get(0).(*corev1.NamespaceList), args.Error(1)
 }
